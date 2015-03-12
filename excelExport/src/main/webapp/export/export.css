@@ -1,0 +1,57 @@
+
+.xr_excel {
+    float:right;
+    margin: 0 auto;
+    text-align: center;
+    padding: 10px 0;
+    color: #555;
+    font: 12px/1.5em Tahoma, Helvetica, Arial, sans-serif;
+}
+
+.xr_excel a {
+    display: inline-block;
+    zoom: 1;
+    float: left;
+    height: 24px;
+    line-height: 24px;
+    padding: 0 10px;
+    border: 1px solid #d4d4d4;
+    vertical-align: middle;
+    text-decoration: none;
+    color: #555555;
+    margin-right: 4px;
+    cursor: pointer;
+}
+.xr-excel .pre_btn .have_page {
+    background-position: 0px -67px;
+}
+
+.xr-excel .pre_btn .no_page {
+    background-position: 0px -40px;
+}
+
+.xr-excel .pre_btn i {
+    padding-left: 8px;
+}
+ 
+.btn-default {
+  display: block;
+  padding-left: 5px;
+  padding-right: 5px; 
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  width: 80px;
+  height: 26px;
+  line-height: 26px;
+  background-color: #dcdddd;
+  border: 1px solid #b5b5b6;
+  color: #595757;
+}
+.btn-default:hover {
+  background-color: #e9eaea;
+  border: 1px solid #c2c2c3;
+}
