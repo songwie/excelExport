@@ -2,6 +2,8 @@ package com.xr.export.action;
 
 import java.util.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,12 +13,12 @@ import com.xr.export.columnEntity.ColumnInfo;
 import com.xr.export.common.ValueStuff;
 
 @RequestMapping("/excel")
-@Controller 
+@Controller
 @Scope("prototype")
 public class ExcelTest extends AbstractExport{
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void export(){
+	public void export(HttpServletRequest request){
 		List list = new ArrayList();
 		/*for(int i=0;i<13;i++){
 			list.add(new Object[]{"列1","列2","列3",800+i,"列5",10000+i,800+i,10000+i,"列9","列10","列11","列12","列13"});
@@ -38,11 +40,11 @@ public class ExcelTest extends AbstractExport{
 		}
 		this.setData( list, "testtitle");
 	};
-	 
-	/*@RequestMapping("/export") 
-	@CheckLoginAnnotation(isLogin=ISLOGIN.NO) 
+
+	/*@RequestMapping("/export")
+	@CheckLoginAnnotation(isLogin=ISLOGIN.NO)
 	@ExportAnnotation
-	public void export(){ 
+	public void export(){
 		Map<String,Object> map = new HashMap<String,Object>();
 		List data = new ArrayList();
 		for(int i=0;i<13;i++){
@@ -51,6 +53,6 @@ public class ExcelTest extends AbstractExport{
 		String title = "titletest";
 		map.put("data", data);
 		map.put("title", title);
-		 
+
 	};*/
 }

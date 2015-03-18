@@ -12,43 +12,46 @@ import com.google.common.base.Strings;
 import com.xr.export.columnEntity.ColumnInfo;
 import com.xr.export.common.MyConverter;
 /**
- * 
+ *
  * @author sw
  *
  */
- 
+
 @SuppressWarnings("rawtypes")
 @MyConverter
 @Component
 public class ColumnInfoTypeConversion implements Converter<String, ArrayList<ColumnInfo>  >{
 
-	 
+
 
 	//int index,String colName,int colWidth,short colDataType,short colAlign,boolean colHidden
 	@Override
-	public  ArrayList<ColumnInfo>  convert(String source) { 
+	public  ArrayList<ColumnInfo>  convert(String source) {
 		return ColumnInfoTypeConversion.parseCols(source);
-	} 
-	
+	}
+
 	public static ArrayList<ColumnInfo> parseCols(String source){
 		if(Strings.isNullOrEmpty(source)){
 			 return null;
 		 }
 		 JSONArray array = JSONArray.fromObject(source);
 		 ArrayList<ColumnInfo> list = new ArrayList<ColumnInfo>();
-		 
-		 
-		 
+
+
+
 		 for(int i=0;i<array.size();i++){
 			 JSONObject cols = array.getJSONObject(i);
-			 
+
 			 int index = cols.getInt("index");
 			 String colName = cols.getString("colName");
 			 String colData = cols.getString("colData");
 
 			 String colWidths = cols.getString("colWidth");
 			 colWidths = colWidths.replace("px", "");
-			 int colWidth = Integer.valueOf(colWidths); 
+			 if(colWidths.indexOf(".")!=-1){
+				 colWidths = colWidths.substring(0,colWidths.indexOf("."));
+			 }
+			 int colWidth = Integer.valueOf( colWidths);
 			 String colDataType = cols.getString("colDataType");
 			 short dtype = ColumnInfo.TYPE_STRING;
 			 if(colDataType.equals("string")){
@@ -80,11 +83,11 @@ public class ColumnInfoTypeConversion implements Converter<String, ArrayList<Col
 			 boolean colHidden = cols.getBoolean("colHidden");
 
 			 ColumnInfo columnInfo = new ColumnInfo(index,colName,colData, colWidth , dtype,align,colHidden);
-			 
+
 			 list.add(columnInfo);
 		 }
 
-		 
+
 		 return list;
 	}
 }

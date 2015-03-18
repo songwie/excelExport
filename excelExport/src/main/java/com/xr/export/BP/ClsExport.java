@@ -42,74 +42,74 @@ import com.xr.export.interfaces.IExport;
 @Component
 @Scope("prototype")
 public class ClsExport implements IExport {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ClsExport.class);
-	
+
 	/**
 	 * 错误判断
 	 */
 	@Autowired
 	private ExportInvalid invalid;
-	
+
 	/**
 	 * 数据块信息
-	 */	
+	 */
 	@Autowired
 	private DataBlockInfo DATABLOCKINFO ;
-		
+
 	/**
 	 * Exce文档
 	 */
 	private HSSFWorkbook WORKBOOK = null;
-		
+
 	/**
 	 * 结果集
 	 */
 	private List<Object[]> RESULTLIST = null;
-	
+
 	/**
 	 * 结果集2
 	 */
 	private List<HashMap<String, Object>> RESULTLIST2 = null;
-	
+
 	/**
 	 * 列及列头信息
-	 */	
-	private List<ColumnInfo> COLUMNINFOLIST = null;	
+	 */
+	private List<ColumnInfo> COLUMNINFOLIST = null;
 
 	/**
 	 * 单页最大行，默认65536
 	 */
 	private int MAXROW = 65536;
-	
+
 	/**
 	 * 当前行号
 	 */
 	private  int CUR_ROW = -1;
-	
+
 	/**
 	 * 当前页号
 	 */
 	private  int CUR_SHEET = 0;
-		
+
 	/**
 	 * 导出文件名
 	 */
 	private String FILE_FIRSTNAME = "";
-	
-	
+
+
 	private String filePathOfSave = "";
 
 	/**
 	 * 导出文件名
 	 */
 	private  String FILE_PATH = "";
-	
+
 	/**
 	 * 垂直比例数
 	 */
 	private static final short VRATIO = 20;
-	
+
 	/**
 	 * 水平比例数
 	 */
@@ -119,12 +119,12 @@ public class ClsExport implements IExport {
 	 * titleName
 	 */
 	private String titleName="";
-	
+
 	/**
 	 * 返回文件流
 	 */
 	private InputStream inputStream;
-	
+
 
 	public String export(List<ColumnInfo> listColumnInfo,List<TableHeadInfo> listTableHeadInfo,List data,String title) {
 		if(log.isDebugEnabled()){
@@ -135,11 +135,12 @@ public class ClsExport implements IExport {
 		}
 		this.setColumInfoList(listColumnInfo);
 		try {
-			this.setTitleName(new String(title.getBytes("GBK"), "ISO8859-1"));
-		} catch (UnsupportedEncodingException e) {
+			this.setTitleName(new String(title.getBytes("UTF-8"), "UTF-8"));
+			//this.setTitleName(title);
+		} catch (Exception e) {
             this.setTitleName("file");
      	}
-        
+
 		if(listTableHeadInfo!=null){
 			//this.setListTableHeadInfo(listTableHeadInfo);
 		}
@@ -150,8 +151,8 @@ public class ClsExport implements IExport {
 			}else {
 				this.setResultList(data);
 			}
-		}*/	
-		
+		}*/
+
 		if(data!=null&&data.size()>0){
 			if(data.get(0) instanceof HashMap<?, ?>){
 				this.setResultList2(data);
@@ -159,22 +160,22 @@ public class ClsExport implements IExport {
 				this.setResultList(data);
 			}
 		}
-		
+
 		this.setFILE_FIRSTNAME( title);
 		String[] SheetName = { title};
 		String info = this.Export();
-		
+
 		if(info!=null){
 			throw new RuntimeException(info);
 		}
-		
-		String fileAddress = this.getFilePathOfSave();	
+
+		String fileAddress = this.getFilePathOfSave();
 		log.info("excel fileAddress :" + fileAddress);
 
 		return fileAddress;
 	}
-	
-	private String Export() {	
+
+	private String Export() {
 		int iRet = 0;
 		iRet = this.initialize();
 		if(iRet <0 ){
@@ -203,35 +204,35 @@ public class ClsExport implements IExport {
 		iRet = this.drawBorder();
 		if(iRet <0 ){
 			return invalid.Invalid(iRet);
-		}		
+		}
 		iRet = this.writeToFile();
 		if(iRet <0 ){
 			return invalid.Invalid(iRet);
 		}
 		return null;
 	}
-	
-	
+
+
 	public int drawTitle() {
 		try {
 			//增加一行
 			HSSFRow row = this.addRow();
-			
+
 			//创建风格
 			HSSFCellStyle cellStyle = this.getCurrWorkBook().createCellStyle();
-			
+
 			//设置样式,居中
 			cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-			
+
 			//设置样式,居中
 			cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-			
+
 			//设置字体
 			HSSFFont font = this.getCurrWorkBook().createFont();
 			font.setFontHeightInPoints((short) 12);
 			font.setFontName("宋体");
 			font.setBoldweight(org.apache.poi.hssf.usermodel.HSSFFont.BOLDWEIGHT_BOLD);
-			
+
 			//关联到style
 			cellStyle.setFont(font);
 			cellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
@@ -242,24 +243,24 @@ public class ClsExport implements IExport {
 				HSSFCell curCell = row.createCell(i);
 				curCell.setCellStyle(cellStyle);
 			}
-			
+
 			//写入信息
 			row.getCell(0).setCellValue(new HSSFRichTextString(titleName));
-			
+
 			//合并
-			this.getCurrSheet().addMergedRegion(new CellRangeAddress(row.getRowNum(), 
+			this.getCurrSheet().addMergedRegion(new CellRangeAddress(row.getRowNum(),
 																	 row.getRowNum(),
 																	 0,
 																	 this.getColumInfoList().size())
 												);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ExportInvalid.ERR_DRAWTITLE;
 		}
 		return 0;
 	}
-	  
+
 	public int drawHead() {
 		HSSFRow row = addRow();
 		if(row == null)
@@ -269,7 +270,7 @@ public class ClsExport implements IExport {
 			if(this.DATABLOCKINFO.ROWNUMBER){
 				HSSFCell cell = row.createCell(0);
 				HSSFCellStyle cs = WORKBOOK.createCellStyle();
-				cs.setAlignment(HSSFCellStyle.ALIGN_CENTER);		
+				cs.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 				cs.setHidden(false);
 				cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 				cs.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
@@ -287,15 +288,15 @@ public class ClsExport implements IExport {
 					cell = row.createCell(info.index);
 					WORKBOOK.getSheetAt(CUR_SHEET).setColumnWidth(info.index, info.colWidth*HRATIO);
 				}
-				
+
 				cell.setCellValue(new HSSFRichTextString(info.colName.
 						replaceAll("<br>", "")));
 				/**这里额外加入对列名的处理，去掉列中的br标签*/
-				
+
 				HSSFCellStyle cs = WORKBOOK.createCellStyle();
 				cs.setAlignment(info.headAlign);
-				cs.setDataFormat(info.headStringDataFomate);				
-				cs.setHidden(info.colHidden);			
+				cs.setDataFormat(info.headStringDataFomate);
+				cs.setHidden(info.colHidden);
 				cs.setFont(info.getHeadFont(WORKBOOK));
 				cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 				cs.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
@@ -304,7 +305,7 @@ public class ClsExport implements IExport {
 					hasSetHeight = true;
 				}
 				cell.setCellStyle(cs);
-			}	
+			}
 		} catch(Exception e){
 			e.printStackTrace();
 			return ExportInvalid.ERR_DRAWHEAD;
@@ -315,77 +316,78 @@ public class ClsExport implements IExport {
 	public int drawMainDataBlock() {
 		try{
 			int columnNum = 1;
-			
+
 			 //序列号
 			HSSFCellStyle cs = WORKBOOK.createCellStyle();
-			cs.setAlignment(HSSFCellStyle.ALIGN_CENTER);		
-			cs.setHidden(false);			
+			cs.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+			cs.setHidden(false);
 			cs.setFont(this.DATABLOCKINFO.getColumnFont(WORKBOOK));
-			
+
 			//根据列号
 			if(this.RESULTLIST!=null&&this.RESULTLIST.size()>0){
 				for(Iterator<Object[]> itRow = this.RESULTLIST.iterator();itRow.hasNext();){
 					HSSFRow row = addRow();
-					
+
 					if(this.DATABLOCKINFO.ROWNUMBER){
 						HSSFCell cell = row.createCell(0);
 						cell.setCellValue(columnNum++);
 						cell.setCellStyle(cs);
 					}
-					
-					row.setHeight((short)(this.DATABLOCKINFO.DataRowHeight*VRATIO));	
+
+					row.setHeight((short)(this.DATABLOCKINFO.DataRowHeight*VRATIO));
 					Object[] objList = itRow.next();
-					
-					for(int col = 0;col <this.COLUMNINFOLIST.size();col++){				
+
+					for(int col = 0;col <this.COLUMNINFOLIST.size();col++){
 						ColumnInfo info = getInfoAt(col);
 						Object obj = objList[col];
-						
-						setDataCell(row,obj,info);					
-					}				
+
+						setDataCell(row,obj,info);
+					}
 				}
 			}else {
 				//根据列索引
 				for(Iterator<HashMap<String, Object>> itRow = this.RESULTLIST2.iterator();itRow.hasNext();){
 					HSSFRow row = addRow();
-					
+
 					if(this.DATABLOCKINFO.ROWNUMBER){
 						HSSFCell cell = row.createCell(0);
 						cell.setCellValue(columnNum++);
 						cell.setCellStyle(cs);
 					}
-					
-					row.setHeight((short)(this.DATABLOCKINFO.DataRowHeight*VRATIO));	
+
+					row.setHeight((short)(this.DATABLOCKINFO.DataRowHeight*VRATIO));
 					HashMap<String, Object> keys = itRow.next();
-					
-					for(int col = 0;col <this.COLUMNINFOLIST.size();col++){				
+
+					for(int col = 0;col <this.COLUMNINFOLIST.size();col++){
 						ColumnInfo info = getInfoAt(col);
 						Object obj =  "";
-						
+
 					    if(keys.containsKey(info.colData)){
 							obj = keys.get(info.colData);
-							break;
+
+							setDataCell(row,obj,info);
+							//break;
 					    }
-						
-						setDataCell(row,obj,info);					
-					}				
+
+					}
 				}
 			}
-			
+
 			if(DATABLOCKINFO.TOTALLINE)
 				addTotalLine();
-			
+
 		}catch(Exception e){
 			e.printStackTrace();
 			return ExportInvalid.ERR_DRAWMAINDATABLOCK;
 		}
 		return 0;
 	}
-	
+
 	public int drawFooter() {
 		return 0;
 	}
-	
-	
+
+
 	/**
 	 * 创建每列的样式
 	 */
@@ -396,7 +398,7 @@ public class ClsExport implements IExport {
 			for(int i=0;i<this.COLUMNINFOLIST.size();i++)
 			{
 				HSSFCellStyle cs = this.WORKBOOK.createCellStyle();
-				cs.setFont(this.DATABLOCKINFO.getColumnFont(WORKBOOK));	
+				cs.setFont(this.DATABLOCKINFO.getColumnFont(WORKBOOK));
 				this.COLUMNINFOLIST.get(i).setCellStyle(cs);
 			}
 		}
@@ -418,29 +420,29 @@ public class ClsExport implements IExport {
 		{
 			for(int row= WORKBOOK.getSheetAt(sheet).getFirstRowNum();row <= WORKBOOK.getSheetAt(sheet).getLastRowNum();row++)
 			{
-				
+
 				if(null == WORKBOOK.getSheetAt(sheet).getRow(row))
 					continue;
-				
+
 				for(int cell=0;cell < getColumnCount();cell++)
 				{
-					
+
 					if(null == WORKBOOK.getSheetAt(sheet).getRow(row).getCell(cell)){
-						WORKBOOK.getSheetAt(sheet).getRow(row).createCell(cell);						
-						HSSFCellStyle cs = WORKBOOK.createCellStyle();						
+						WORKBOOK.getSheetAt(sheet).getRow(row).createCell(cell);
+						HSSFCellStyle cs = WORKBOOK.createCellStyle();
 						cs.setBorderBottom(HSSFCellStyle.BORDER_THIN);
 						cs.setBorderLeft(HSSFCellStyle.BORDER_THIN);
 						cs.setBorderRight(HSSFCellStyle.BORDER_THIN);
-						cs.setBorderTop(HSSFCellStyle.BORDER_THIN);						
+						cs.setBorderTop(HSSFCellStyle.BORDER_THIN);
 						WORKBOOK.getSheetAt(sheet).getRow(row).getCell(cell).setCellStyle(cs);
 						continue;
 					}
 					if(null == WORKBOOK.getSheetAt(sheet).getRow(row).getCell(cell).getCellStyle())	{
-						HSSFCellStyle cs = WORKBOOK.createCellStyle();						
+						HSSFCellStyle cs = WORKBOOK.createCellStyle();
 						cs.setBorderBottom(HSSFCellStyle.BORDER_THIN);
 						cs.setBorderLeft(HSSFCellStyle.BORDER_THIN);
 						cs.setBorderRight(HSSFCellStyle.BORDER_THIN);
-						cs.setBorderTop(HSSFCellStyle.BORDER_THIN);						
+						cs.setBorderTop(HSSFCellStyle.BORDER_THIN);
 						WORKBOOK.getSheetAt(sheet).getRow(row).getCell(cell).setCellStyle(cs);
 						continue;
 					}
@@ -448,13 +450,13 @@ public class ClsExport implements IExport {
 					cs.setBorderBottom(HSSFCellStyle.BORDER_THIN);
 					cs.setBorderLeft(HSSFCellStyle.BORDER_THIN);
 					cs.setBorderRight(HSSFCellStyle.BORDER_THIN);
-					cs.setBorderTop(HSSFCellStyle.BORDER_THIN);					
+					cs.setBorderTop(HSSFCellStyle.BORDER_THIN);
 					WORKBOOK.getSheetAt(sheet).getRow(row).getCell(cell).setCellStyle(cs);
 				}
 			}
 		}
-		
-		
+
+
 		}catch(Exception e)
 		{
 			e.printStackTrace();
@@ -462,12 +464,12 @@ public class ClsExport implements IExport {
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * 初始化Excel文档
 	 * @return 成功返回非负值
 	 */
-	private int initialize() {		
+	private int initialize() {
 		try {
 			if(this.getColumInfoList().size() == 0)
 				return ExportInvalid.ERR_NOCOLUMNINFO;
@@ -479,14 +481,14 @@ public class ClsExport implements IExport {
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * 生成文件
 	 * @return 成功返回非负值
 	 */
 	private int writeToFile(){
 		try {
-			String strGuid = UUID.randomUUID().toString();		
+			String strGuid = UUID.randomUUID().toString();
 			String filePath = "";
 			if(System.getProperty("os.name").indexOf("Windows")!=-1)
 			{
@@ -499,13 +501,13 @@ public class ClsExport implements IExport {
 			if(log.isDebugEnabled()){
 				log.debug("excel filePath :" + filePath);
 			}
-			
+
 			this.setFILE_PATH(filePath);
 			String strFile =  this.getFILE_PATH() +File.separator+this.FILE_FIRSTNAME+"$"+strGuid+".xls";
 			this.setFilePathOfSave(strGuid);
 			File file = new File(this.getFILE_PATH());
 			file.mkdirs();
-			FileOutputStream fs = new FileOutputStream(strFile);			
+			FileOutputStream fs = new FileOutputStream(strFile);
 			WORKBOOK.write(fs);
 			fs.close();
 //			InputStream inputStream = new FileInputStream(strFile);
@@ -517,7 +519,7 @@ public class ClsExport implements IExport {
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * 增加合计行
 	 */
@@ -526,9 +528,9 @@ public class ClsExport implements IExport {
 		HSSFRow row = addRow();
 		HSSFCell cell = row.createCell(0);
 		HSSFCellStyle cs = WORKBOOK.createCellStyle();
-		cs.setAlignment(HSSFCellStyle.ALIGN_RIGHT);		
-		cs.setHidden(false);		
-		HSSFFont font = WORKBOOK.createFont();	
+		cs.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+		cs.setHidden(false);
+		HSSFFont font = WORKBOOK.createFont();
 		font.setStrikeout(false);
 		font.setBoldweight(org.apache.poi.hssf.usermodel.HSSFFont.BOLDWEIGHT_BOLD);
 		cs.setFont(font);
@@ -537,9 +539,9 @@ public class ClsExport implements IExport {
 		cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 		cs.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
 
-		
-		
-		for(int i = 0;i <COLUMNINFOLIST.size();i++){				
+
+
+		for(int i = 0;i <COLUMNINFOLIST.size();i++){
 			ColumnInfo info = COLUMNINFOLIST.get(i);
 			if(this.DATABLOCKINFO.ROWNUMBER){
 				cell = row.createCell(info.index+1);
@@ -549,9 +551,9 @@ public class ClsExport implements IExport {
 			if((info.colDateType == ColumnInfo.TYPE_DOUBLE)||(info.colDateType == ColumnInfo.TYPE_BIGDECIMAL)||info.colDateType == ColumnInfo.TYPE_INT)
 			{
 				cs = WORKBOOK.createCellStyle();
-				cs.setAlignment(info.colAlign);		
-				cs.setHidden(false);			
-				cs.setFont(this.DATABLOCKINFO.getColumnFont(WORKBOOK));	
+				cs.setAlignment(info.colAlign);
+				cs.setHidden(false);
+				cs.setFont(this.DATABLOCKINFO.getColumnFont(WORKBOOK));
 				cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 				cs.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
 
@@ -559,15 +561,15 @@ public class ClsExport implements IExport {
 					cs.setDataFormat(info.colGeneralDataFomate);
 
 				}else{
-					cs.setDataFormat(info.colNumericDataFomate);				
+					cs.setDataFormat(info.colNumericDataFomate);
 				}
 				cell.setCellValue(info.sumValue);
-			} 
+			}
 			cell.setCellStyle(cs);
-		}			
-		
+		}
+
 	}
-	
+
 	/**
 	 * 设数据块单元值
 	 * @param row HSSFRow 当前操作行
@@ -580,40 +582,40 @@ public class ClsExport implements IExport {
 			cell = row.createCell(info.index+1);
 		else
 			cell = row.createCell(info.index);
-		
+
 		HSSFCellStyle cs = info.getCellStyle();
 		cs.setAlignment(info.colAlign);
 		cs.setHidden(info.colHidden);
 		//cs.setFont(this.DATABLOCKINFO.getColumnFont(WORKBOOK));
-		
+
 
 		if(info.colDateType == ColumnInfo.TYPE_NONE || info.colDateType == ColumnInfo.TYPE_UNKNOW)
-			info.colDateType = getObjectType(obj,info);	
-		
+			info.colDateType = getObjectType(obj,info);
+
 		String sVal;
 		Date dtVal;
 		double dVal;
 		int iVal;
 		boolean bVal;
 		short shVal;
-		
+
 		switch(info.colDateType){
 			case ColumnInfo.TYPE_STRING :
 				sVal = (obj!=null?obj.toString():"");
 				sVal = sVal.replaceAll("&nbsp;", " ");
 				cell.setCellValue(new HSSFRichTextString(sVal));
-				cs.setDataFormat(info.colGeneralDataFomate);	
+				cs.setDataFormat(info.colGeneralDataFomate);
 				break;
 			case ColumnInfo.TYPE_BOOLEAN :
 				bVal = (obj!=null?Boolean.valueOf(obj.toString()).booleanValue():false);
 				cell.setCellValue(bVal);
-				cs.setDataFormat(info.colGeneralDataFomate);	
+				cs.setDataFormat(info.colGeneralDataFomate);
 				break;
 			case ColumnInfo.TYPE_DATE :
 				dtVal = ((obj!=null&&!obj.equals(""))?(Date)obj:null);
 				if(dtVal != null){
 					cell.setCellValue(dtVal);
-					cs.setDataFormat(info.colDateDataFomate);	
+					cs.setDataFormat(info.colDateDataFomate);
 				}
 				else{
 					cell.setCellValue(new HSSFRichTextString(""));
@@ -630,7 +632,7 @@ public class ClsExport implements IExport {
 				cell.setCellValue(dVal);
 				cs.setDataFormat(info.colNumericDataFomate);
 				info.sumValue += dVal;
-				break;	
+				break;
 			case ColumnInfo.TYPE_PERCENT:
 				dVal = (obj!=null?Double.parseDouble(obj.toString()):(double)0);
 				cell.setCellValue(dVal/100);
@@ -645,26 +647,26 @@ public class ClsExport implements IExport {
 			case ColumnInfo.TYPE_SHORT :
 				shVal = (obj!=null?Short.parseShort(obj.toString()):(short)0);
 				cell.setCellValue(shVal);
-				cs.setDataFormat(info.colGeneralDataFomate);	
+				cs.setDataFormat(info.colGeneralDataFomate);
 				info.sumValue += shVal;
-				break;	
+				break;
 			case ColumnInfo.TYPE_NONE :
 				sVal = (obj!=null?obj.toString():"");
 				cell.setCellValue(new HSSFRichTextString(sVal));
-				cs.setDataFormat(info.colGeneralDataFomate);				
+				cs.setDataFormat(info.colGeneralDataFomate);
 				break;
 			case ColumnInfo.TYPE_UNKNOW :
 				sVal = (obj!=null?obj.toString():"");
 				cell.setCellValue(new HSSFRichTextString(sVal));
-				cs.setDataFormat(info.colGeneralDataFomate);	
-				break;	
+				cs.setDataFormat(info.colGeneralDataFomate);
+				break;
 		}
 		cell.setCellStyle(cs);
 	}
-	
+
 	/**
 	 * 增加行
-	 * @return HSSFRow 
+	 * @return HSSFRow
 	 */
 	protected HSSFRow addRow(){
 		if(CUR_ROW == MAXROW-1){
@@ -676,7 +678,7 @@ public class ClsExport implements IExport {
 		}
 		return WORKBOOK.getSheetAt(CUR_SHEET).createRow(CUR_ROW);
 	}
-			
+
 	/**
 	 * 设置列类型
 	 * @return
@@ -704,7 +706,7 @@ public class ClsExport implements IExport {
 		else if((obj instanceof java.math.BigDecimal)&&(info.colName.indexOf("%")!=-1)&&(info.colName.indexOf("%")==info.colName.lastIndexOf("%")))
 		{
 			return ColumnInfo.TYPE_PERCENT;
-		}		
+		}
 		else if(obj instanceof java.lang.Double)
 		{
 			return ColumnInfo.TYPE_DOUBLE;
@@ -733,9 +735,9 @@ public class ClsExport implements IExport {
 		{
 			return ColumnInfo.TYPE_UNKNOW;
 		}
-		
+
 	}
-	
+
 	/**
 	 * 得到相应index的列信息
 	 * @param index
@@ -751,19 +753,19 @@ public class ClsExport implements IExport {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 得到当前SHEET
-	 * 
+	 *
 	 */
 	protected HSSFSheet getCurrSheet()
 	{
 		return WORKBOOK.getSheetAt(CUR_SHEET);
 	}
-	
+
 	/**
 	 * 得到当前HSSFWorkbook
-	 * 
+	 *
 	 */
 	protected HSSFWorkbook getCurrWorkBook()
 	{
@@ -771,7 +773,7 @@ public class ClsExport implements IExport {
 	}
 	/**
 	 * 得到当前行
-	 * 
+	 *
 	 */
 	protected HSSFRow getCurrRow()
 	{
@@ -786,14 +788,14 @@ public class ClsExport implements IExport {
 
 	/**
 	 * 设定结果集
-	 * @param resultList 
+	 * @param resultList
 	 */
 	public void setResultList(List<Object[]> resultList) {
 		this.RESULTLIST = resultList;
 	}
 	/**
 	 * 设定结果集
-	 * @param resultList 
+	 * @param resultList
 	 */
 	public void setResultList2(List resultList2) {
 		this.RESULTLIST2 = resultList2;
@@ -811,7 +813,7 @@ public class ClsExport implements IExport {
 	public void setColumInfoList(List<ColumnInfo> columInfoList) {
 		this.COLUMNINFOLIST = columInfoList;
 	}
-	
+
 	/**
 	 * 单页最大行，默认65536
 	 */
@@ -825,21 +827,21 @@ public class ClsExport implements IExport {
 	public void setMaxRow(int maxRow) {
 		this.MAXROW = maxRow;
 	}
-	
+
 	/**
 	 * 数据块信息
 	 */
 	public DataBlockInfo getDataBolckInfo() {
 		return DATABLOCKINFO;
 	}
-	
+
 	/**
 	 * 数据块信息
 	 */
 	public void setDataBolckInfo(DataBlockInfo dataBolckInfo) {
 		DATABLOCKINFO = dataBolckInfo;
 	}
-	
+
 	/**
 	 * 导出文件名
 	 */
@@ -853,7 +855,7 @@ public class ClsExport implements IExport {
 	public void setFILE_FIRSTNAME(String file_firstname) {
 		FILE_FIRSTNAME = file_firstname;
 	}
-	
+
 	/**
 	 * 得到文件路径
 	 */
@@ -877,7 +879,7 @@ public class ClsExport implements IExport {
 		this.filePathOfSave = filePathOfSave;
 	}
 
-	
+
 	/**
 	 * 得到列数
 	 */
@@ -901,7 +903,7 @@ public class ClsExport implements IExport {
 		this.inputStream = inputStream;
 	}
 
-	
-	
-	
+
+
+
 }

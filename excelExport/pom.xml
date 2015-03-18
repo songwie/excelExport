@@ -4,7 +4,7 @@
     <groupId>com.xr</groupId>
     <artifactId>xuriexport</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0.BUILD-SNAPSHOT</version>
     <name>XuriExport</name>
     <properties>
         <aspectj.version>1.7.2</aspectj.version>
@@ -14,7 +14,7 @@
         <spring.version>3.2.3.RELEASE</spring.version>
         <spring-security.version>3.2.3.RELEASE</spring-security.version>
     </properties>
-    <distributionManagement> 
+    <distributionManagement>
 		<repository>
 			<id>releases</id>
 			<url>http://116.236.223.116:8082/nexus/content/repositories/releases</url>
@@ -25,7 +25,7 @@
 			<name>Internal Snapshots</name>
 			<url>http://116.236.223.116:8082/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
-	</distributionManagement> 
+	</distributionManagement>
     <repositories>
         <repository>
             <id>spring-maven-release</id>
@@ -42,8 +42,8 @@
             <name>my internal repository</name>
             <url>http://116.236.223.116:8082/nexus/content/groups/public/</url>
         </repository>
-    </repositories> 
-    
+    </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>spring-maven-release</id>
@@ -56,14 +56,14 @@
             <url>http://maven.springframework.org/milestone</url>
         </pluginRepository>
     </pluginRepositories>
-    
+
     <dependencies>
         <!-- General dependencies for standard applications -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -186,7 +186,7 @@
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-beans</artifactId>
 		    <version>${spring.version}</version>
-		</dependency>        
+		</dependency>
         <dependency>
 		  <groupId>javax.persistence</groupId>
 		  <artifactId>persistence-api</artifactId>
@@ -227,11 +227,11 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.9</version>
-		</dependency>    
-        <dependency>  
-             <groupId>p6spy</groupId> 
-             <artifactId>p6spy</artifactId> 
-             <version>1.3</version> 
+		</dependency>
+        <dependency>
+             <groupId>p6spy</groupId>
+             <artifactId>p6spy</artifactId>
+             <version>1.3</version>
         </dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -248,10 +248,10 @@
 		</dependency>
 
     </dependencies>
-     
-     
+
+
     <profiles>
-    
+
       <profile>
       <id>dev</id>
       <activation>
@@ -270,7 +270,7 @@
         </plugins>
       </build>
       </profile>
-      
+
       <profile>
       <id>test</id>
       <!--
@@ -294,7 +294,7 @@
         </plugins>
       </build>
       </profile>
-      
+
       <profile>
       <id>prod</id>
       <!--
@@ -319,7 +319,7 @@
       </build>
       </profile>
     </profiles>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -376,11 +376,11 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <!--
-                      Aspects in src/main/java and src/main/aspects are added as default in the 
+                      Aspects in src/main/java and src/main/aspects are added as default in the
                       compile goal.
-                      Aspects in src/test/java and src/test/aspects are added as default in the 
+                      Aspects in src/test/java and src/test/aspects are added as default in the
                       test-compile goal.
-                      Aspects in src/main/java are added in the test-compile goal 
+                      Aspects in src/main/java are added in the test-compile goal
                       if weaveWithAspectsInMainSourceFolder is set to true
                     -->
                     <weaveWithAspectsInMainSourceFolder>false</weaveWithAspectsInMainSourceFolder>
@@ -399,7 +399,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12</version>
                 <configuration>
-                    <skipTests>true</skipTests>   
+                    <skipTests>true</skipTests>
                     <printSummary>false</printSummary>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <excludes>
@@ -476,7 +476,7 @@
 						</baseResource>
 					</webAppConfig>
 				</configuration>
-			</plugin> 
+			</plugin>
 			<!-- <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>

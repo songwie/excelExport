@@ -14,7 +14,7 @@ DownloadExcel_getColumnInfo =  function(datatable)
 	var columnInfo = [];
 	if(datatable.dataTableSettings){
 		var cums = datatable.dataTableSettings[0].aoColumns;
-		for(var i=0;i<cums.length;i++){  
+		for(var i=0;i<cums.length;i++){
 			var datacul = cums[i];
 			var column = {};
 			column.index = i;
@@ -28,34 +28,33 @@ DownloadExcel_getColumnInfo =  function(datatable)
 			columnInfo.push(column);
 		}
 	}
-	
+
 	if(columnInfo.length ==0)
 	{
 		return false;
 	}
-	
+
 	return columnInfo;
 }
 
-DownloadExcel_downloadExcel = function(baseurl,url,datatable,ntype,cols)
+DownloadExcel_downloadExcel = function(baseurl,url,datatable,ntype,cols,params)
 {
 	var columnInfo = DownloadExcel_getColumnInfo(datatable);
 	if(columnInfo == false)
 	{
 		return false;
 	}
-	
-	var data = {};
-	data.columnInfo =  JSON.stringify(columnInfo) ;
-	
-
+	var data = { };
+    data.columnInfo =  JSON.stringify(columnInfo) ;
+    data.params =  JSON.stringify(params) ;
+console.debug(data)
 	$.ajax({
-		  type: "POST",
+		  type: "post",
 		  url: baseurl + url,
 		  timeout:999999999,
 		  data : data,
 		  dataType:'json',
-		  contentType:'utf-8',
+		  contentType: "application/x-www-form-urlencoded; charset=utf-8",
 		  success: function(msg){
 			  if(typeof msg=='string'){
 				  var rs = $.parseJSON(msg);
@@ -66,8 +65,8 @@ DownloadExcel_downloadExcel = function(baseurl,url,datatable,ntype,cols)
 				  alert("导出失败："+msg.error);
 			  }else{
 					var data = {
-						filename : rs.fileAddress	
-					};  
+						filename : rs.fileAddress
+					};
 					var form = document.createElement("form");
 					document.body.appendChild(form);
 					for(var name in data){
@@ -77,19 +76,19 @@ DownloadExcel_downloadExcel = function(baseurl,url,datatable,ntype,cols)
 						i.value = data[name];
 						i.name = name;
 					}
-	
+
 					form.action = baseurl + "excel/down1";
 					form.method="GET";
 					form.target="_self";
-					form.submit();		     		     
+					form.submit();
 
 			  }
 		  }
 	});
- 	
+
 }
 
- 
+
 
 
 
