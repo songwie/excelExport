@@ -17,39 +17,23 @@ excel 公用导出组件，提供统一参数，然后导出excel 组件包
 例：
 [
 {
-  
    index: 0, 
-  
    colName: "商品ID", 
-  
    colData: "goodsId", 
-  
    colWidth: "47px", 
-  
    colDataType: "numeric", 
-  
    colAlign: "", 
-  
    colHidden: false
  }, 
  {
-  
    index: 1, 
-  
    colName: "商品编号", 
-  
    colData: "goodsNo", 
-  
    colWidth: "84px", 
-  
    colDataType: "string", 
-  
    colAlign: "", 
-  
    colHidden: false
-  
  }
-
 ]
 
 代码引入：
