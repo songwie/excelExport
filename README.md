@@ -16,6 +16,7 @@ excel 公用导出组件，提供统一参数，然后导出excel 组件包
 
 例：
 [
+
 {
    index: 0, 
    colName: "商品ID", 
@@ -25,6 +26,7 @@ excel 公用导出组件，提供统一参数，然后导出excel 组件包
    colAlign: "", 
    colHidden: false
  }, 
+
  {
    index: 1, 
    colName: "商品编号", 
@@ -34,6 +36,7 @@ excel 公用导出组件，提供统一参数，然后导出excel 组件包
    colAlign: "", 
    colHidden: false
  }
+ 
 ]
  
 代码引入：
