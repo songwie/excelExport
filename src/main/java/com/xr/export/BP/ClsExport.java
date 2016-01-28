@@ -475,6 +475,8 @@ public class ClsExport implements IExport {
 				return ExportInvalid.ERR_NOCOLUMNINFO;
 			this.WORKBOOK = new HSSFWorkbook();
 			this.WORKBOOK.createSheet();
+			this.CUR_ROW = -1;
+			this.CUR_SHEET = 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ExportInvalid.ERR_INITIALIZE;

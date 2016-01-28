@@ -3,20 +3,22 @@ package com.xr.export.BP;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.xr.export.columnEntity.ColumnInfo;
 import com.xr.export.columnEntity.TableHeadInfo;
 import com.xr.export.interfaces.IExport;
 
+import net.sf.json.JSONObject;
+
 @Component
+@Scope("prototype")
 public class ExportProxy {
 
 	@Autowired
-	IExport clsExport;	
+	private IExport clsExport;	
 
 	private String fileAddress = "";
 
@@ -35,7 +37,6 @@ public class ExportProxy {
 			this.data = data;
 			this.title = title;
 			 
-			
 			this.fileAddress = clsExport.export(this.listColumnInfo, this.listHeadInfo, this.data,this.title);	
 			jsonObject.put("fileAddress", fileAddress);
 		}catch(Exception e){

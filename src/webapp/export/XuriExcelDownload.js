@@ -11,44 +11,63 @@
 	 */
 DownloadExcel_getColumnInfo =  function(datatable)
 {
+	var tablesId = datatable.selector;
+ 
 	var columnInfo = [];
 	if(datatable.dataTableSettings){
-		var cums = datatable.dataTableSettings[0].aoColumns;
-		for(var i=0;i<cums.length;i++){
-			var datacul = cums[i];
-			var column = {};
-			column.index = i;
-			column.colName = datacul.sTitle;
-			column.colWidth = datacul.sWidth ;
-			column.colDataType = datacul.sType;
-			column.colAlign = datacul.sClass;
-			column.colHidden = !datacul.bVisible;
-			column.colData = datacul.mData;
+		var tables = datatable.dataTableSettings;
+		for(var i=0;i<tables.length;i++){
+			var table = tables[i];
+			if(table.sInstance==tablesId){
+				var cums = table.aoColumns;
+				for(var i=0;i<cums.length;i++){
+					var datacul = cums[i];
+					var column = {};
+					column.index = i;
+					column.colName = datacul.sTitle;
+					column.colWidth = datacul.sWidth ;
+					column.colDataType = datacul.sType;
+					column.colAlign = datacul.sClass;
+					var fHidden = false;
+					if(datacul.fExportHidden || !datacul.bVisible ){
+						fHidden = true;
+						column.colWidth = "0px";
+					}
+					column.colHidden = fHidden ;
+					column.colData = datacul.mData;
 
-			columnInfo.push(column);
+					columnInfo.push(column);
+				}
+			}
 		}
+		
 	}
 
 	if(columnInfo.length ==0)
 	{
 		return false;
-	}
+	} 
 
 	return columnInfo;
 }
 
-DownloadExcel_downloadExcel = function(baseurl,url,datatable,ntype,cols,params)
+DownloadExcel_downloadExcel = function(baseurl,url,datatable, ntype,cols,params)
 {
+ 
 	var columnInfo = DownloadExcel_getColumnInfo(datatable);
 	if(columnInfo == false)
 	{
 		return false;
 	}
 	var data = { };
-    data.columnInfo =  JSON.stringify(columnInfo) ;
+	if(cols){
+	    data.columnInfo =  JSON.stringify(cols) ;
+	}else{
+	    data.columnInfo =  JSON.stringify(columnInfo) ;
+	}
     data.params =  JSON.stringify(params) ;
-console.debug(data)
-	$.ajax({
+
+    $.ajax({
 		  type: "post",
 		  url: baseurl + url,
 		  timeout:999999999,

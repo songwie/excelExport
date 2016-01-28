@@ -2,15 +2,14 @@ package com.xr.export.typeconversion;
 
 import java.util.ArrayList;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
 import com.xr.export.columnEntity.ColumnInfo;
 import com.xr.export.common.MyConverter;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 /**
  *
  * @author sw
@@ -31,7 +30,7 @@ public class ColumnInfoTypeConversion implements Converter<String, ArrayList<Col
 	}
 
 	public static ArrayList<ColumnInfo> parseCols(String source){
-		if(Strings.isNullOrEmpty(source)){
+		if(source==null || source.equals("")){
 			 return null;
 		 }
 		 JSONArray array = JSONArray.fromObject(source);
